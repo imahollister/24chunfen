@@ -110,10 +110,12 @@ export default function SpringEquinoxV2() {
     const lotteryCount = dataManager.getTransactions().filter(t => t.source === '幸运抽奖').length + 
                          dataManager.getOrders().filter(o => o.type === 'lottery').length;
     
-    const isEggs = (lotteryCount % 2) !== 0; // 0 (1st try) -> Beans, 1 (2nd try) -> Eggs. 
-    // Wait, user said "First beans, second eggs". 
-    // 1st try: count=0. isEggs=false -> Beans. Correct.
-    // 2nd try: count=1. isEggs=true -> Eggs. Correct.
+    // Logic: First time beans, second time eggs.
+    // Count 0 -> Beans (will be 1 after)
+    // Count 1 -> Eggs (will be 2 after)
+    // Count 2 -> Beans
+    // So if even -> Beans, odd -> Eggs.
+    const isEggs = (lotteryCount % 2) !== 0; 
     
     setTimeout(() => {
       setLotteryPrize(isEggs ? 'eggs' : 'beans');
@@ -132,6 +134,12 @@ export default function SpringEquinoxV2() {
     setShowAddressModal(false);
     setLotteryState('completed');
     showToastMsg('提交成功，等待发货');
+    
+    // Auto reset for demo purposes
+    setTimeout(() => {
+        setLotteryState('idle');
+        setLotteryPrize(null);
+    }, 2000);
   };
 
   // 处理投票点击
@@ -337,7 +345,14 @@ export default function SpringEquinoxV2() {
                         <Coins className="w-12 h-12 text-yellow-500 mb-3 animate-bounce" />
                         <h3 className="text-lg font-bold text-gray-800 mb-2">恭喜获得50个节气豆！</h3>
                         <button 
-                          onClick={() => setLotteryState('completed')}
+                          onClick={() => {
+                              setLotteryState('completed');
+                              // Auto reset for demo purposes
+                              setTimeout(() => {
+                                  setLotteryState('idle');
+                                  setLotteryPrize(null);
+                              }, 2000);
+                          }}
                           className="w-full bg-yellow-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 active:scale-95 transition-all"
                         >
                           收入囊中
