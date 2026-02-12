@@ -96,8 +96,24 @@ export default function SpringEquinoxV2() {
     if (lotteryState !== 'idle') return;
     setLotteryState('drawing');
     
-    // 模拟抽奖结果
-    const isEggs = Math.random() < 0.5;
+    // Determine prize based on user's last win or random
+    // Check if user has won eggs before
+    const hasWonEggs = dataManager.getOrders().some(o => o.type === 'lottery' && o.productName.includes('鸡蛋'));
+    
+    // Logic: If haven't won eggs, 50% chance. If won eggs, mostly beans.
+    // For demo purpose as requested: Alternate. 
+    // Since we don't track 'last prize' explicitly in a simple way, let's check count.
+    // If even number of lottery wins -> eggs, odd -> beans? Or just random as before but controlled.
+    // User requested: "First time beans, second time eggs" sequence implies state.
+    
+    // Let's implement a simple local toggle for this session or check global history count
+    const lotteryCount = dataManager.getTransactions().filter(t => t.source === '幸运抽奖').length + 
+                         dataManager.getOrders().filter(o => o.type === 'lottery').length;
+    
+    const isEggs = (lotteryCount % 2) !== 0; // 0 (1st try) -> Beans, 1 (2nd try) -> Eggs. 
+    // Wait, user said "First beans, second eggs". 
+    // 1st try: count=0. isEggs=false -> Beans. Correct.
+    // 2nd try: count=1. isEggs=true -> Eggs. Correct.
     
     setTimeout(() => {
       setLotteryPrize(isEggs ? 'eggs' : 'beans');
@@ -194,12 +210,12 @@ export default function SpringEquinoxV2() {
         {/* 顶部导航栏 */}
         <div className={`absolute top-0 left-0 right-0 z-40 h-11 flex items-center justify-center transition-all duration-300 ${scrollY > 50 ? 'bg-white/90 backdrop-blur shadow-sm' : 'bg-transparent'}`}>
           <span className={`font-medium text-lg ${scrollY > 50 ? 'text-gray-800' : 'text-[#1a3c26]'}`}>
-            苏周到二十四节气 · {activity.name}
+            苏周到二十四节气
           </span>
         </div>
 
-        {/* 顶部右侧功能区 */}
-        <div className="absolute top-2 right-4 z-50 flex gap-3">
+        {/* 顶部右侧功能区 - Moved down slightly to avoid overlap */}
+        <div className="absolute top-12 right-4 z-30 flex flex-col gap-3">
           <button onClick={handleShare} className="p-2 bg-white/80 backdrop-blur rounded-full shadow-sm">
             <Share2 className="w-4 h-4 text-gray-700" />
           </button>
@@ -244,9 +260,14 @@ export default function SpringEquinoxV2() {
             </svg>
 
             <div className="absolute bottom-16 left-0 right-0 px-6 text-center z-20">
-              <h1 className="text-5xl font-bold text-[#1a3c26] mb-3 tracking-wider font-serif animate-fade-in-up" style={{ textShadow: '0 2px 4px rgba(255,255,255,0.8)' }}>
-                {activity.name.split('').join(' ')}
+              <h1 className="text-4xl font-bold text-[#1a3c26] mb-3 tracking-wider font-serif animate-fade-in-up leading-tight" style={{ textShadow: '0 2px 4px rgba(255,255,255,0.8)' }}>
+                {activity.name}
               </h1>
+              {activity.subtitle && (
+                <p className="text-[#2c4c38] text-lg mt-2 font-medium animate-fade-in-up delay-100" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
+                  {activity.subtitle}
+                </p>
+              )}
               <p className="text-[#2c4c38] text-sm mt-4 leading-relaxed max-w-[280px] mx-auto animate-fade-in-up delay-200 font-medium" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
                 {activity.startTime} ~ {activity.endTime}
               </p>
@@ -257,7 +278,6 @@ export default function SpringEquinoxV2() {
           <section id="lottery" className="mt-[-20px] relative z-10 px-4">
             <div className="flex items-center justify-between mb-3 px-1">
               <h2 className="text-lg font-bold flex items-center gap-2">
-                <Gift className="w-5 h-5 text-red-500" />
                 <span>幸运抽奖</span>
               </h2>
               <span className="text-xs text-gray-400">100%中奖机会</span>
@@ -343,7 +363,6 @@ export default function SpringEquinoxV2() {
           <section className="mt-8 px-4">
             <div className="flex items-center justify-between mb-4 px-1">
               <h2 className="text-lg font-bold flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-blue-500" />
                 <span>{activity.interaction.type === 'vote' ? '话题PK' : '趣味答题'}</span>
               </h2>
               <span className="text-xs bg-blue-50 text-blue-500 px-2 py-1 rounded">送节气豆</span>
@@ -433,6 +452,7 @@ export default function SpringEquinoxV2() {
                         </div>
                         <div className="p-3">
                         <h4 className="text-sm font-bold text-gray-800 truncate">{item.name}</h4>
+                        {item.subtitle && <p className="text-[10px] text-gray-500 truncate mt-0.5">{item.subtitle}</p>}
                         <div className="flex items-center justify-between mt-2">
                             <span className="text-sm font-bold text-orange-500">¥{item.price}</span>
                         </div>
@@ -457,6 +477,7 @@ export default function SpringEquinoxV2() {
                         </div>
                         <div className="p-3">
                         <h4 className="text-sm font-bold text-gray-800 truncate">{item.name}</h4>
+                        {item.subtitle && <p className="text-[10px] text-gray-500 truncate mt-0.5">{item.subtitle}</p>}
                         <div className="flex items-center justify-between mt-2">
                             <span className="text-sm font-bold text-orange-500">¥{item.price}</span>
                         </div>

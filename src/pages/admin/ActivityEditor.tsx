@@ -122,6 +122,12 @@ export default function ActivityEditor() {
                     placeholder="名称"
                   />
                   <input 
+                    className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm" 
+                    value={item.subtitle || ''} 
+                    onChange={e => update(idx, 'subtitle', e.target.value)}
+                    placeholder="副标题"
+                  />
+                  <input 
                     className="w-24 border border-gray-300 rounded px-2 py-1 text-sm" 
                     value={item.price} 
                     type="number"
@@ -209,6 +215,15 @@ export default function ActivityEditor() {
                   onChange={e => setFormData({...formData, name: e.target.value})}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="例如：春分·竖蛋"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">副标题 (Subtitle)</label>
+                <input 
+                  value={formData.subtitle || ''}
+                  onChange={e => setFormData({...formData, subtitle: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="例如：春色正中分，美好正当时"
                 />
               </div>
               <div>

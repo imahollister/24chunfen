@@ -45,15 +45,15 @@ const INITIAL_VOTE_OPTIONS: VoteOption[] = [
 ];
 
 const INITIAL_FOODS: Product[] = [
-  { id: 'f1', type: 'food', name: '鲜嫩春笋', description: '春日限定美味', price: 28.8, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=fresh%20spring%20bamboo%20shoots%20high%20quality%20photography&image_size=square'], displayOrder: 1, isActive: true, createdAt: new Date().toISOString() },
-  { id: 'f2', type: 'food', name: '红油香椿', description: '一口春天的味道', price: 38.8, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=fresh%20chinese%20toon%20sprouts%20vegetable%20photography&image_size=square'], displayOrder: 2, isActive: true, createdAt: new Date().toISOString() },
-  { id: 'f3', type: 'food', name: '野生荠菜', description: '鲜美包饺子', price: 18.8, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=fresh%20shepherd%27s%20purse%20green%20vegetable%20basket&image_size=square'], displayOrder: 3, isActive: true, createdAt: new Date().toISOString() },
+  { id: 'f1', type: 'food', name: '鲜嫩春笋', subtitle: '山野之鲜', description: '春日限定美味', price: 28.8, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=fresh%20spring%20bamboo%20shoots%20high%20quality%20photography&image_size=square'], displayOrder: 1, isActive: true, createdAt: new Date().toISOString() },
+  { id: 'f2', type: 'food', name: '红油香椿', subtitle: '时令野菜', description: '一口春天的味道', price: 38.8, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=fresh%20chinese%20toon%20sprouts%20vegetable%20photography&image_size=square'], displayOrder: 2, isActive: true, createdAt: new Date().toISOString() },
+  { id: 'f3', type: 'food', name: '野生荠菜', subtitle: '鲜香可口', description: '鲜美包饺子', price: 18.8, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=fresh%20shepherd%27s%20purse%20green%20vegetable%20basket&image_size=square'], displayOrder: 3, isActive: true, createdAt: new Date().toISOString() },
 ];
 
 const INITIAL_PRODUCTS: Product[] = [
-  { id: 'p1', type: 'merchandise', name: '智能煮蛋器', description: '精准控温', price: 59.9, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=modern%20white%20egg%20cooker%20appliance%20minimalist&image_size=square'], displayOrder: 1, isActive: true, createdAt: new Date().toISOString() },
-  { id: 'p2', type: 'merchandise', name: '春日野餐垫', description: '防水加厚', price: 89.9, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=picnic%20mat%20on%20green%20grass%20spring%20outdoor&image_size=square'], displayOrder: 2, isActive: true, createdAt: new Date().toISOString() },
-  { id: 'p3', type: 'merchandise', name: '陶瓷蛋托', description: '创意收纳', price: 29.9, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=ceramic%20egg%20holder%20tray%20cute%20design&image_size=square'], displayOrder: 3, isActive: true, createdAt: new Date().toISOString() },
+  { id: 'p1', type: 'merchandise', name: '智能煮蛋器', subtitle: '自动断电', description: '精准控温', price: 59.9, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=modern%20white%20egg%20cooker%20appliance%20minimalist&image_size=square'], displayOrder: 1, isActive: true, createdAt: new Date().toISOString() },
+  { id: 'p2', type: 'merchandise', name: '春日野餐垫', subtitle: '加厚防潮', description: '防水加厚', price: 89.9, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=picnic%20mat%20on%20green%20grass%20spring%20outdoor&image_size=square'], displayOrder: 2, isActive: true, createdAt: new Date().toISOString() },
+  { id: 'p3', type: 'merchandise', name: '陶瓷蛋托', subtitle: '可爱造型', description: '创意收纳', price: 29.9, currency: 'cny', images: ['https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=ceramic%20egg%20holder%20tray%20cute%20design&image_size=square'], displayOrder: 3, isActive: true, createdAt: new Date().toISOString() },
 ];
 
 const INITIAL_SPOTS: Product[] = [
@@ -71,7 +71,8 @@ const INITIAL_SHOP_PRODUCTS: Product[] = [
 
 const INITIAL_ACTIVITY: Activity = {
   id: 'spring_equinox_2024',
-  name: '春分·竖蛋',
+  name: '春分到，蛋儿俏',
+  subtitle: '春色正中分，美好正当时',
   termType: 'chunfen',
   startTime: '2024-03-20',
   endTime: '2024-03-22',
@@ -105,6 +106,47 @@ class DataManager {
 
     if (savedActivities) {
       this.activities = JSON.parse(savedActivities);
+      // Migration: Update name if it's the old default
+      if (this.activities[0]?.id === 'spring_equinox_2024') {
+        let needsSave = false;
+        
+        // 1. Update Title/Subtitle if needed
+        if (this.activities[0].name === '春分·竖蛋') {
+            this.activities[0].name = '春分到，蛋儿俏';
+            this.activities[0].subtitle = '春色正中分，美好正当时';
+            needsSave = true;
+        }
+
+        // 2. Migration: Backfill subtitles for Recommended Foods
+        if (this.activities[0].recommendedFoods) {
+            this.activities[0].recommendedFoods.forEach(food => {
+                if (!food.subtitle) {
+                    const defaultItem = INITIAL_FOODS.find(f => f.id === food.id);
+                    if (defaultItem?.subtitle) {
+                        food.subtitle = defaultItem.subtitle;
+                        needsSave = true;
+                    }
+                }
+            });
+        }
+
+        // 3. Migration: Backfill subtitles for Recommended Products
+        if (this.activities[0].recommendedProducts) {
+            this.activities[0].recommendedProducts.forEach(prod => {
+                if (!prod.subtitle) {
+                    const defaultItem = INITIAL_PRODUCTS.find(p => p.id === prod.id);
+                    if (defaultItem?.subtitle) {
+                        prod.subtitle = defaultItem.subtitle;
+                        needsSave = true;
+                    }
+                }
+            });
+        }
+
+        if (needsSave) {
+            this.saveActivities();
+        }
+      }
     } else {
       this.activities = [INITIAL_ACTIVITY];
       this.saveActivities();

@@ -2,6 +2,7 @@ export interface Product {
   id: string;
   type: 'food' | 'merchandise' | 'spot' | 'digital';
   name: string;
+  subtitle?: string; // New subtitle field for product cards
   description: string;
   images: string[];
   price: number; // For shop items (beans) or display price (CNY)
@@ -37,6 +38,7 @@ export interface InteractionConfig {
 export interface Activity {
   id: string;
   name: string;
+  subtitle?: string; // New subtitle field
   termType: string; // e.g. 'chunfen', 'xiazhi'
   startTime: string;
   endTime: string;
