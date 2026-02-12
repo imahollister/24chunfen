@@ -27,37 +27,64 @@ export function DataTable<T extends { id: string }>({
   actions
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentSize, setCurrentSize] = useState(pageSize);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterValue, setFilterValue] = useState('all');
 
   // Filter and Search Logic
   const filteredData = useMemo(() => {
     return data.filter(item => {
-      // 1. Search
       const matchesSearch = Object.values(item).some(val => 
         String(val).toLowerCase().includes(searchTerm.toLowerCase())
       );
       
-      // 2. Filter (Callback to parent if provided, otherwise simple equality check on 'status' or similar common field could be added here, 
-      // but for now we rely on the parent to pre-filter data or handle complex logic. 
-      // Ideally, the parent component should handle the "business logic" of filtering.
-      // Here we just provide the UI for filter selection.)
+      if (filterValue !== 'all' && onFilterChange) {
+         // Parent handles logic if onFilterChange is provided, 
+         // but here we might need to filter if parent doesn't handle "data" prop update
+         // For this simple component, we assume 'onFilterChange' just notifies parent
+         // OR we implement simple local filtering if needed. 
+         // BUT, looking at usage, parent passes ALL data.
+         // Let's assume for now filterValue is handled by parent pre-filtering data OR
+         // we add a simple local check: if the item has a 'status' field matching filterValue.
+         if ('status' in item && (item as any).status !== filterValue) {
+             return false;
+         }
+      }
       
       return matchesSearch;
     });
-  }, [data, searchTerm]);
+  }, [data, searchTerm, filterValue]);
 
   // Pagination Logic
-  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const totalPages = Math.ceil(filteredData.length / currentSize);
   const paginatedData = filteredData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    (currentPage - 1) * currentSize,
+    currentPage * currentSize
   );
 
   const handleFilterClick = (value: string) => {
     setFilterValue(value);
     if (onFilterChange) onFilterChange(value);
-    setCurrentPage(1); // Reset to page 1 on filter change
+    setCurrentPage(1); 
+  };
+  
+  // Generate Page Numbers
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5; // Max buttons to show
+    
+    if (totalPages <= maxVisible) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        if (currentPage <= 3) {
+            pages.push(1, 2, 3, 4, '...', totalPages);
+        } else if (currentPage >= totalPages - 2) {
+            pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        } else {
+            pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+        }
+    }
+    return pages;
   };
 
   return (
@@ -138,11 +165,23 @@ export function DataTable<T extends { id: string }>({
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {totalPages > 0 && (
         <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <div className="text-xs text-gray-500">
-            显示 {(currentPage - 1) * pageSize + 1} 到 {Math.min(currentPage * pageSize, filteredData.length)} 条，共 {filteredData.length} 条
+          <div className="flex items-center gap-4">
+             <div className="text-xs text-gray-500">
+                共 {filteredData.length} 条
+             </div>
+             <select 
+                value={currentSize} 
+                onChange={e => { setCurrentSize(Number(e.target.value)); setCurrentPage(1); }}
+                className="text-xs border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+             >
+                <option value={10}>10条/页</option>
+                <option value={20}>20条/页</option>
+                <option value={50}>50条/页</option>
+             </select>
           </div>
+          
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
@@ -151,9 +190,26 @@ export function DataTable<T extends { id: string }>({
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm font-medium text-gray-700">
-              {currentPage} / {totalPages}
-            </span>
+            
+            <div className="flex items-center gap-1">
+                {getPageNumbers().map((p, i) => (
+                    <button
+                        key={i}
+                        onClick={() => typeof p === 'number' && setCurrentPage(p)}
+                        disabled={typeof p !== 'number'}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                            p === currentPage 
+                                ? 'bg-blue-600 text-white shadow-sm' 
+                                : typeof p === 'number' 
+                                    ? 'hover:bg-gray-200 text-gray-600'
+                                    : 'text-gray-400 cursor-default'
+                        }`}
+                    >
+                        {p}
+                    </button>
+                ))}
+            </div>
+
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
