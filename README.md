@@ -1,57 +1,74 @@
-# React + TypeScript + Vite
+# 苏周到二十四节气活动管理平台
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个基于 React + TypeScript 的全栈式活动管理解决方案，专为“苏周到”APP设计的二十四节气主题活动平台。系统包含**平台运营后台（O端）**与**移动客户端（C端）**两大部分，支持通过可视化配置快速生成不同的节气活动页面。
 
-Currently, two official plugins are available:
+## 🌟 项目亮点
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+*   **动态配置引擎**：通过后台可视化界面配置活动主题、时间、互动形式（投票/答题）及推荐内容，前端实时生效。
+*   **沉浸式体验**：移动端页面采用国风水墨设计，完美契合传统二十四节气文化。
+*   **完整商业闭环**：内置“节气豆”积分体系，包含获取（互动/抽奖）、消耗（商城兑换）及物流管理（后台导出）。
+*   **纯前端 Mock 架构**：使用 `LocalStorage` 模拟完整后端数据库（DataManager），开箱即用，刷新不丢失。
 
-## Expanding the ESLint configuration
+## 🚀 功能模块
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🖥️ 平台运营后台 (O-End)
+*   **仪表盘**：实时查看活动数据、用户持豆总量及商城订单概况。
+*   **活动管理**：
+    *   创建/编辑节气活动（支持配置“春分”、“夏至”等不同主题）。
+    *   **互动配置**：自定义“投票PK”选项或“趣味答题”题库。
+    *   **内容挂载**：动态添加活动页面的推荐美食、周边商品和景点。
+    *   **中奖管理**：查看并导出实物奖品中奖记录（CSV格式），用于线下发货。
+*   **商城管理**：
+    *   商品库管理（增删改查、库存控制）。
+    *   兑换记录查询（区分普通兑换与抽奖赠送）。
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### 📱 移动客户端 (C-End)
+*   **节气主会场**：
+    *   沉浸式头图与背景音乐（模拟）。
+    *   **趣味互动**：如“春分竖蛋”抽奖（50%概率得实物鸡蛋，50%得节气豆）。
+    *   **话题互动**：参与投票或答题赢取积分。
+*   **节气豆商城**：
+    *   使用节气豆兑换精美周边。
+    *   查看个人收支明细与兑换历史。
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ 技术栈
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+*   **核心框架**: React 18, TypeScript
+*   **构建工具**: Vite
+*   **样式库**: Tailwind CSS
+*   **路由**: React Router v6
+*   **图标库**: Lucide React
+*   **数据模拟**: Custom DataManager (LocalStorage based)
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 📦 快速开始
+
+1.  **克隆项目**
+    ```bash
+    git clone https://github.com/imahollister/24chunfen.git
+    cd 24chunfen
+    ```
+
+2.  **安装依赖**
+    ```bash
+    npm install
+    ```
+
+3.  **启动开发服务器**
+    ```bash
+    npm run dev
+    ```
+
+4.  **访问系统**
+    *   打开浏览器访问 `http://localhost:5173`（端口可能随空闲情况变化）。
+    *   默认进入**统一门户页**，可点击左侧菜单切换“后台”或“移动端”视图。
+
+## 📸 系统预览
+
+### 统一门户
+集成了后台管理系统与移动端预览窗口，方便运营人员即时查看配置效果。
+
+### 活动编辑器
+支持抽屉式交互，流畅配置活动基础信息与复杂的互动题目。
+
+---
+© 2026 苏州市二十四节气活动系统 | TechDemo
